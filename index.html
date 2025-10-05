@@ -44,5 +44,78 @@
 <body>
   <h1>Players Podcast - Instant Gaming</h1>
 
-  <img src="banner.png" alt="Banner Players Podcast e
+  <img src="banner.png" alt="Banner Players Podcast e Instant Gaming">
 
+  <p>
+    ¿Te interesa un juego en Instant Gaming? 🕹️<br>
+    Pega el enlace aquí, pulsa el botón y se generará tu enlace con afiliado.<br>
+    Luego lo abres en el navegador ¡y estarás apoyando a Players Podcast sin pagar de más! 💙
+  </p>
+
+  <input type="text" id="original" placeholder="https://www.instant-gaming.com/..." />
+  <button onclick="generar()">Generar enlace con afiliado</button>
+
+  <p><strong>Tu enlace listo para compartir o abrir:</strong></p>
+  <textarea id="resultado" rows="3" readonly></textarea>
+
+  <div class="acciones">
+    <button onclick="copiar()">📋 Copiar enlace</button>
+    <button onclick="compartir()">🔗 Compartir</button>
+  </div>
+
+  <script>
+    async function generar() {
+      const input = document.getElementById("original").value.trim();
+      if (!input.includes("instant-gaming.com")) {
+        alert("Esto no parece un enlace válido de Instant Gaming.");
+        return;
+      }
+
+      let enlaceFinal = input.includes('?') ? input + "&igr=playerspodcast" : input + "?igr=playerspodcast";
+
+      // Acortar con acortar.link
+      try {
+        const res = await fetch("https://acortar.link/api", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: enlaceFinal })
+        });
+
+        const data = await res.json();
+
+        if (data && data.result_url) {
+          document.getElementById("resultado").value = data.result_url;
+        } else {
+          document.getElementById("resultado").value = enlaceFinal; // fallback
+        }
+      } catch (e) {
+        console.error("Error al acortar el enlace:", e);
+        document.getElementById("resultado").value = enlaceFinal;
+      }
+    }
+
+    function copiar() {
+      const resultado = document.getElementById("resultado");
+      if (!resultado.value) return;
+      resultado.select();
+      document.execCommand("copy");
+      alert("¡Enlace copiado al portapapeles!");
+    }
+
+    function compartir() {
+      const link = document.getElementById("resultado").value;
+      if (!link) return;
+
+      if (navigator.share) {
+        navigator.share({
+          title: 'Enlace de Instant Gaming',
+          text: 'Aquí tienes el juego con el enlace de Players Podcast:',
+          url: link
+        }).catch(console.error);
+      } else {
+        alert("Tu navegador no soporta la función de compartir directamente.");
+      }
+    }
+  </script>
+</body>
+</html>
