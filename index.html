@@ -63,59 +63,69 @@
     <button onclick="compartir()">🔗 Compartir</button>
   </div>
 
-  <script>
-    async function generar() {
-      const input = document.getElementById("original").value.trim();
-      if (!input.includes("instant-gaming.com")) {
-        alert("Esto no parece un enlace válido de Instant Gaming.");
-        return;
-      }
+<script>
+  async function generar() {
+    const input = document.getElementById("original").value.trim();
+    if (!input.includes("instant-gaming.com")) {
+      alert("Esto no parece un enlace válido de Instant Gaming.");
+      return;
+    }
 
-      let enlaceFinal = input.includes('?') ? input + "&igr=playerspodcast" : input + "?igr=playerspodcast";
+    let enlaceFinal = input.includes('?') ? input + "&igr=playerspodcast" : input + "?igr=playerspodcast";
 
-      // Acortar con acortar.link
-      try {
-        const res = await fetch("https://acortar.link/api", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url: enlaceFinal })
-        });
+    // Intentamos acortar el enlace
+    try {
+      const res = await fetch("https://acortar.link/api", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          url: enlaceFinal  // <- importante que sea exactamente "url"
+        })
+      });
 
-        const data = await res.json();
+      const data = await res.json();
 
-        if (data && data.result_url) {
-          document.getElementById("resultado").value = data.result_url;
-        } else {
-          document.getElementById("resultado").value = enlaceFinal; // fallback
-        }
-      } catch (e) {
-        console.error("Error al acortar el enlace:", e);
+      if (data.result_url) {
+        document.getElementById("resultado").value = data.result_url;
+      } else if (data.shortLink) {
+        document.getElementById("resultado").value = data.shortLink;
+      } else {
+        console.warn("No se recibió result_url:", data);
         document.getElementById("resultado").value = enlaceFinal;
       }
-    }
 
-    function copiar() {
-      const resultado = document.getElementById("resultado");
-      if (!resultado.value) return;
-      resultado.select();
-      document.execCommand("copy");
-      alert("¡Enlace copiado al portapapeles!");
+    } catch (e) {
+      console.error("Error al acortar el enlace:", e);
+      document.getElementById("resultado").value = enlaceFinal;
     }
+  }
 
-    function compartir() {
-      const link = document.getElementById("resultado").value;
-      if (!link) return;
+  function copiar() {
+    const resultado = document.getElementById("resultado");
+    if (!resultado.value) return;
+    resultado.select();
+    document.execCommand("copy");
+    alert("¡Enlace copiado al portapapeles!");
+  }
 
-      if (navigator.share) {
-        navigator.share({
-          title: 'Enlace de Instant Gaming',
-          text: 'Aquí tienes el juego con el enlace de Players Podcast:',
-          url: link
-        }).catch(console.error);
-      } else {
-        alert("Tu navegador no soporta la función de compartir directamente.");
-      }
+  function compartir() {
+    const link = document.getElementById("resultado").value;
+    if (!link) return;
+
+    if (navigator.share) {
+      navigator.share({
+        title: 'Enlace de Instant Gaming',
+        text: 'Aquí tienes el juego con el enlace de Players Podcast:',
+        url: link
+      }).catch(console.error);
+    } else {
+      alert("Tu navegador no soporta la función de compartir directamente.");
     }
+  }
+</script>
+
   </script>
 </body>
 </html>
