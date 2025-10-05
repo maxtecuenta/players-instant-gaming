@@ -1,55 +1,48 @@
-<script>
-  async function generar() {
-    const input = document.getElementById("original").value.trim();
-    if (!input.includes("instant-gaming.com")) {
-      alert("Esto no parece un enlace válido de Instant Gaming.");
-      return;
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Players Podcast - Instant Gaming</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 20px;
+      line-height: 1.6;
     }
-
-    let enlaceFinal = input.includes('?') ? input + "&igr=playerspodcast" : input + "?igr=playerspodcast";
-
-    // Acortar con acortar.link
-    try {
-      const res = await fetch("https://acortar.link/api", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: enlaceFinal })
-      });
-
-      const data = await res.json();
-
-      if (data && data.result_url) {
-        document.getElementById("resultado").value = data.result_url;
-      } else {
-        document.getElementById("resultado").value = enlaceFinal; // fallback
-      }
-    } catch (e) {
-      console.error("Error al acortar el enlace:", e);
-      document.getElementById("resultado").value = enlaceFinal;
+    input, button, textarea {
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 16px;
     }
-  }
-
-  function copiar() {
-    const resultado = document.getElementById("resultado");
-    if (!resultado.value) return;
-    resultado.select();
-    document.execCommand("copy");
-    alert("¡Enlace copiado al portapapeles!");
-  }
-
-  function compartir() {
-    const link = document.getElementById("resultado").value;
-    if (!link) return;
-
-    if (navigator.share) {
-      navigator.share({
-        title: 'Enlace de Instant Gaming',
-        text: 'Aquí tienes el juego con el enlace de Players Podcast:',
-        url: link
-      }).catch(console.error);
-    } else {
-      alert("Tu navegador no soporta la función de compartir directamente.");
+    textarea {
+      resize: none;
     }
-  }
-</script>
+    h1 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    p {
+      font-size: 16px;
+    }
+    .acciones {
+      display: flex;
+      gap: 10px;
+    }
+    .acciones button {
+      flex: 1;
+    }
+    img {
+      width: 100%;
+      max-width: 600px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Players Podcast - Instant Gaming</h1>
+
+  <img src="banner.png" alt="Banner Players Podcast e
 
