@@ -73,32 +73,21 @@
 
     let enlaceFinal = input.includes('?') ? input + "&igr=playerspodcast" : input + "?igr=playerspodcast";
 
-    // Intentamos acortar el enlace
+    // Acortar con TinyURL
     try {
-      const res = await fetch("https://acortar.link/api", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          url: enlaceFinal  // <- importante que sea exactamente "url"
-        })
-      });
+      const response = await fetch("https://tinyurl.com/api-create.php?url=" + encodeURIComponent(enlaceFinal));
+      const enlaceCorto = await response.text();
 
-      const data = await res.json();
-
-      if (data.result_url) {
-        document.getElementById("resultado").value = data.result_url;
-      } else if (data.shortLink) {
-        document.getElementById("resultado").value = data.shortLink;
+      if (enlaceCorto.startsWith("http")) {
+        document.getElementById("resultado").value = enlaceCorto;
       } else {
-        console.warn("No se recibió result_url:", data);
-        document.getElementById("resultado").value = enlaceFinal;
+        throw new Error("Respuesta inesperada: " + enlaceCorto);
       }
 
-    } catch (e) {
-      console.error("Error al acortar el enlace:", e);
+    } catch (error) {
+      console.error("Error al acortar con TinyURL:", error);
       document.getElementById("resultado").value = enlaceFinal;
+      alert("No se pudo acortar el enlace. Se mostrará el original.");
     }
   }
 
@@ -125,6 +114,7 @@
     }
   }
 </script>
+
 
   </script>
 </body>
